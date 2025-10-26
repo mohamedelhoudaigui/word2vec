@@ -151,6 +151,16 @@ void	Word2vec::make_training_pairs() {
 }
 
 
+void	Word2vec::verify() {
+	for (auto & sentance : this->tokenized_corpus) {
+		for (auto & token : sentance) {
+			if (!this->vocab.count(token)) {
+				abort();
+			}
+		}
+	}
+}
+
 
 void	Word2vec::initialize_matrix(vector<vector<double> >& matrix, unsigned int row, unsigned int col) {
 	// a row for each word
@@ -198,13 +208,10 @@ void	Word2vec::matrix_mult(const vector<double> & vec, const vector<vector<doubl
 void	Word2vec::training_loop(unsigned int epochs) {
 
 	for (unsigned int i = 0; i < epochs; ++i) {
-		for (const auto& p : this->dec_training_pairs) {
-			vector<double> output_scores;
-			matrix_mult(this->embedding_matrix[p.first], this->output_matrix, output_scores);
-			//cout << "vector size = " << this->embedding_matrix[(int)p.first].size() << endl;
-			//cout << "matrix size = " << this->output_matrix.size() << endl;
-			softmax(output_scores);
-			//(void)predic_prob;
+		for (auto & p : this->dec_training_pairs) {
+			vector<double> result;
+			matrix_mult(this->embedding_matrix[p.first - 1], this->output_matrix, result);
+			softmax(result);
 		}
 	}
 }

@@ -36,6 +36,7 @@ class Word2vec {
 		const Word2vec & operator=(const Word2vec & other);
 		~Word2vec();
 
+		void			verify();
 		void			print_training_pairs();
 		void			print_embedding_matrix();
 		double			get_random_uniform();
@@ -48,7 +49,7 @@ class Word2vec {
 
 	private:
 		vector<pair<string, string> >	training_pairs;
-		vector<pair<double, double> >	dec_training_pairs;
+		vector<pair<int, int> >	dec_training_pairs;
 		unordered_map<string, ll>		vocab;
 		vector<vector<string> >			tokenized_corpus;
 		vector<vector<double> >			embedding_matrix;
