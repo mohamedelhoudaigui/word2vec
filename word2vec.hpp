@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <utility>
 
 
 using namespace std;
@@ -28,6 +29,8 @@ class Word2vec {
 		~Word2vec();
 
 		void	make_training_pairs();
+		void	one_hot_encoder();
+		void	print_training_pairs();
 
 	private:
 		vector<pair<string, string> >	training_pairs;

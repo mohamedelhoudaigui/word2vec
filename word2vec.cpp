@@ -30,12 +30,76 @@ Word2vec::~Word2vec() {
 
 }
 
+//-----------------helper functions---------------------
+
+
+void	Word2vec::print_training_pairs() {
+	cout << "-------training pairs-----------" << endl;
+
+	for (const auto & pair : this->training_pairs) {
+		cout << pair.first << " -> " <<  pair.second << endl;
+		cout << "-------------------------------" << endl;
+	}
+}
+
+
+
+
+
+
+
 //------------------main functions-----------------------
 
 void	Word2vec::make_training_pairs() {
-	for (auto & vec : this->tokenized_corpus) {
-		for (auto & chunk : vec) {
-			
+
+	cout << "starting to make training pairs" << endl;
+	cout << "-------------------------------" << endl;
+
+	// pre calculate the number of pairs :
+
+	size_t total_pairs = 0;
+    const ll side_size = this->sliding_window / 2;
+    if (side_size <= 0)
+		return;
+
+	for (const auto & sentance : this->tokenized_corpus) {
+		const ll sentance_size = sentance.size();
+
+		if (sentance_size <= 1)
+			continue ;
+
+		for (ll i = 0; i < sentance_size; ++i) {
+			ll lower_bound = max((ll)0, i - side_size);
+			ll upper_bound = min(sentance_size - 1, i + side_size);
+			total_pairs += (upper_bound - lower_bound);
 		}
 	}
+
+	// doing this save us from using .push_back() which is expensive
+	this->training_pairs.reserve(total_pairs);
+
+	// now filling the traing pairs
+	for (const auto & sentance : this->tokenized_corpus) {
+		const ll sentance_size = sentance.size();
+
+		if (sentance_size <= 1)
+			continue ;
+
+		for (ll i = 0; i < sentance_size; ++i) {
+			ll start = max((ll)0, i - side_size);
+			ll end = min(sentance_size, i + side_size + 1);
+			
+			for (ll j = start; j < end; ++j) {
+				if (j == i)
+					continue ;
+				this->training_pairs.emplace_back(sentance[i], sentance[j]);
+			}
+		}
+	}
+
+	cout <<"finished making training pairs" << endl;
+}
+
+void	Word2vec::one_hot_encoder() {
+
 }
