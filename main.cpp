@@ -19,7 +19,7 @@ int main (int argc , char *argv[]) {
 	//tokenizer.print_token_corpus();
 
 	embedder.make_training_pairs();
-	embedder.print_training_pairs();
+	//embedder.print_training_pairs();
 
 	return 0;
 }

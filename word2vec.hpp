@@ -34,6 +34,7 @@ class Word2vec {
 
 	private:
 		vector<pair<string, string> >	training_pairs;
+		vector<pair<ll, ll> >			dec_training_pairs;
 		unordered_map<string, ll>		vocab;
 		unsigned int					sliding_window;
 		vector<vector<string> >			tokenized_corpus;

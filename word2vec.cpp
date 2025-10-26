@@ -13,6 +13,7 @@ Word2vec::Word2vec(const Word2vec & other) {
 	this->tokenized_corpus = other.tokenized_corpus;
 	this->sliding_window = other.sliding_window;
 	this->training_pairs = other.training_pairs;
+	this->dec_training_pairs = other.dec_training_pairs;
 }
 
 const Word2vec & Word2vec::operator=(const Word2vec & other) {
@@ -21,6 +22,7 @@ const Word2vec & Word2vec::operator=(const Word2vec & other) {
 		this->tokenized_corpus = other.tokenized_corpus;
 		this->sliding_window = other.sliding_window;
 		this->training_pairs = other.training_pairs;
+		this->dec_training_pairs = other.dec_training_pairs;
 	}
 
 	return *this;
@@ -41,10 +43,6 @@ void	Word2vec::print_training_pairs() {
 		cout << "-------------------------------" << endl;
 	}
 }
-
-
-
-
 
 
 
@@ -77,6 +75,7 @@ void	Word2vec::make_training_pairs() {
 
 	// doing this save us from using .push_back() which is expensive
 	this->training_pairs.reserve(total_pairs);
+	this->dec_training_pairs.reserve(total_pairs);
 
 	// now filling the traing pairs
 	for (const auto & sentance : this->tokenized_corpus) {
@@ -93,6 +92,8 @@ void	Word2vec::make_training_pairs() {
 				if (j == i)
 					continue ;
 				this->training_pairs.emplace_back(sentance[i], sentance[j]);
+				this->dec_training_pairs.emplace_back(this->vocab[sentance[i]],
+													this->vocab[sentance[j]]);
 			}
 		}
 	}
@@ -100,6 +101,7 @@ void	Word2vec::make_training_pairs() {
 	cout <<"finished making training pairs" << endl;
 }
 
-void	Word2vec::one_hot_encoder() {
 
+void	Word2vec::one_hot_encoder() {
+	
 }
