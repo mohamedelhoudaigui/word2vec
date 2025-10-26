@@ -10,7 +10,9 @@ Word2vec::Word2vec(vector<vector<string> > tokenized_corpus,
 	this->sliding_window = sliding_window;
 	this->tokenized_corpus = tokenized_corpus;
 	this->embedding_size = embedding_size;
-	initialize_embedding_matrix();
+
+	initialize_matrix(this->embedding_matrix, vocab.size(), embedding_size);
+	initialize_matrix(this->output_matrix, this->embedding_size, this->vocab.size());
 }
 
 Word2vec::Word2vec(const Word2vec & other) {
@@ -21,6 +23,7 @@ Word2vec::Word2vec(const Word2vec & other) {
 	this->dec_training_pairs = other.dec_training_pairs;
 	this->embedding_size = other.embedding_size;
 	this->embedding_matrix = other.embedding_matrix;
+	this->output_matrix = other.output_matrix;
 }
 
 const Word2vec & Word2vec::operator=(const Word2vec & other) {
@@ -32,6 +35,7 @@ const Word2vec & Word2vec::operator=(const Word2vec & other) {
 		this->dec_training_pairs = other.dec_training_pairs;
 		this->embedding_size = other.embedding_size;
 		this->embedding_matrix = other.embedding_matrix;
+		this->output_matrix = other.output_matrix;
 	}
 
 	return *this;
@@ -70,6 +74,24 @@ void	Word2vec::print_embedding_matrix() {
 		cout << endl;
 	}
 	cout << "------------------------------------" << endl;
+}
+
+vector<double> Word2vec::softmax(vector<double>& input_vector) {
+
+    vector<double> output_vector;
+    output_vector.reserve(input_vector.size());
+
+    double sum_exp = 0.0;
+
+    for (double value : input_vector) {
+        sum_exp += std::exp(value);
+    }
+
+    for (double value : input_vector) {
+        output_vector.push_back(std::exp(value) / sum_exp);
+    }
+
+    return output_vector;
 }
 
 
@@ -130,20 +152,59 @@ void	Word2vec::make_training_pairs() {
 
 
 
-void	Word2vec::initialize_embedding_matrix() {
+void	Word2vec::initialize_matrix(vector<vector<double> >& matrix, unsigned int row, unsigned int col) {
 	// a row for each word
-	this->embedding_matrix.resize(this->vocab.size());
+	matrix.resize(row);
 
-	for (size_t i = 0; i < this->embedding_matrix.size(); ++i) {
-		this->embedding_matrix[i].resize(this->embedding_size);
+	for (size_t i = 0; i < row; ++i) {
+		matrix[i].resize(col);
 
-		for (size_t j = 0; j < this->embedding_size; ++j) {
-			this->embedding_matrix[i][j] = get_random_uniform();
+		for (size_t j = 0; j < col; ++j) {
+			matrix[i][j] = get_random_uniform();
 		}
 	}
 
 }
 
-void	Word2vec::one_hot_encoder() {
+void	Word2vec::matrix_mult(const vector<double> & vec, const vector<vector<double> > & matrix, vector<double> & output_scores) {
 
+	if (matrix.empty() || matrix[0].empty() || vec.empty()) {
+        cerr << "error: matrix or vector are empty" << endl;
+		output_scores.clear();
+        return ;
+    }
+
+	const size_t embedding_size = vec.size();
+    const size_t vocab_size = matrix[0].size();
+
+
+    if (embedding_size != matrix.size()) {
+        cerr << "error: dimension mismatch for matrix multiplication" << endl;
+        cerr << "vector size is " << vec.size() << ", but Matrix rows are " << matrix.size() << endl;
+		output_scores.clear();
+        return ;
+    }
+
+	output_scores.assign(vocab_size, 0.0);
+
+	for (size_t k = 0; k < embedding_size; ++k) {
+        const double v1_k = vec[k]; 
+        for (size_t j = 0; j < vocab_size; ++j) {
+            output_scores[j] += v1_k * matrix[k][j];
+        }
+    }
+}
+
+void	Word2vec::training_loop(unsigned int epochs) {
+
+	for (unsigned int i = 0; i < epochs; ++i) {
+		for (const auto& p : this->dec_training_pairs) {
+			vector<double> output_scores;
+			matrix_mult(this->embedding_matrix[p.first], this->output_matrix, output_scores);
+			//cout << "vector size = " << this->embedding_matrix[(int)p.first].size() << endl;
+			//cout << "matrix size = " << this->output_matrix.size() << endl;
+			softmax(output_scores);
+			//(void)predic_prob;
+		}
+	}
 }

@@ -36,20 +36,23 @@ class Word2vec {
 		const Word2vec & operator=(const Word2vec & other);
 		~Word2vec();
 
-		void	print_training_pairs();
-		void	print_embedding_matrix();
-		double	get_random_uniform();
+		void			print_training_pairs();
+		void			print_embedding_matrix();
+		double			get_random_uniform();
+		vector<double>	softmax(vector<double>& input_vector);
+		void			matrix_mult(const vector<double> & vec, const vector<vector<double> > & matrix, vector<double> & output_scores);
 
-		void	make_training_pairs();
-		void	initialize_embedding_matrix();
-		void	one_hot_encoder();
+		void			make_training_pairs();
+		void			initialize_matrix(vector<vector<double> >& matrix, unsigned int row, unsigned int col);
+		void			training_loop(unsigned int epochs);
 
 	private:
 		vector<pair<string, string> >	training_pairs;
-		vector<pair<ll, ll> >			dec_training_pairs;
+		vector<pair<double, double> >	dec_training_pairs;
 		unordered_map<string, ll>		vocab;
 		vector<vector<string> >			tokenized_corpus;
 		vector<vector<double> >			embedding_matrix;
+		vector<vector<double> >			output_matrix;
 		unsigned int					sliding_window;
 		unsigned int					embedding_size;
 

@@ -6,7 +6,7 @@ OBJS = $(SRCS:.cpp=.o)
 
 CC = c++
 
-CFLAGS = -Wall -Wextra -Werror -std=c++11
+CFLAGS = -Wall -Wextra -Werror -std=c++11 -fsanitize=address
 
 TOK = make -C tokenizer
 

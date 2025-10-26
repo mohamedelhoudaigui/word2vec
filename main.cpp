@@ -20,8 +20,9 @@ int main (int argc , char *argv[]) {
 	//tokenizer.print_token_corpus();
 
 	embedder.make_training_pairs();
+	embedder.training_loop(1);
 	//embedder.print_training_pairs();
-	embedder.print_embedding_matrix();
+	//embedder.print_embedding_matrix();
 
 	return 0;
 }
