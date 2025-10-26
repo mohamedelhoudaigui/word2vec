@@ -2,10 +2,15 @@
 
 //-------------canonical form----------------
 
-Word2vec::Word2vec(vector<vector<string> > tokenized_corpus, unordered_map<string, ll> vocab, unsigned int sliding_window) {
+Word2vec::Word2vec(vector<vector<string> > tokenized_corpus,
+					unordered_map<string, ll> vocab,
+					unsigned int sliding_window,
+					unsigned int embedding_size) {
 	this->vocab = vocab;
 	this->sliding_window = sliding_window;
 	this->tokenized_corpus = tokenized_corpus;
+	this->embedding_size = embedding_size;
+	initialize_embedding_matrix();
 }
 
 Word2vec::Word2vec(const Word2vec & other) {
@@ -14,6 +19,8 @@ Word2vec::Word2vec(const Word2vec & other) {
 	this->sliding_window = other.sliding_window;
 	this->training_pairs = other.training_pairs;
 	this->dec_training_pairs = other.dec_training_pairs;
+	this->embedding_size = other.embedding_size;
+	this->embedding_matrix = other.embedding_matrix;
 }
 
 const Word2vec & Word2vec::operator=(const Word2vec & other) {
@@ -23,6 +30,8 @@ const Word2vec & Word2vec::operator=(const Word2vec & other) {
 		this->sliding_window = other.sliding_window;
 		this->training_pairs = other.training_pairs;
 		this->dec_training_pairs = other.dec_training_pairs;
+		this->embedding_size = other.embedding_size;
+		this->embedding_matrix = other.embedding_matrix;
 	}
 
 	return *this;
@@ -44,6 +53,24 @@ void	Word2vec::print_training_pairs() {
 	}
 }
 
+double		Word2vec::get_random_uniform() {
+
+	static mt19937 engine(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    uniform_real_distribution<double> distribution(-0.5, 0.5);
+
+    return distribution(engine);
+}
+
+void	Word2vec::print_embedding_matrix() {
+	cout << "-----------embedding matrix -----------" << endl;
+	for (const auto& word : this->embedding_matrix) {
+		for (const auto& p : word) {
+			cout << fixed  << setprecision(3) << p << '*';
+		}
+		cout << endl;
+	}
+	cout << "------------------------------------" << endl;
+}
 
 
 //------------------main functions-----------------------
@@ -98,10 +125,25 @@ void	Word2vec::make_training_pairs() {
 		}
 	}
 
-	cout <<"finished making training pairs" << endl;
+	cout <<"finished making training pairs, total : " << this->training_pairs.size() << endl;
 }
 
 
+
+void	Word2vec::initialize_embedding_matrix() {
+	// a row for each word
+	this->embedding_matrix.resize(this->vocab.size());
+
+	for (size_t i = 0; i < this->embedding_matrix.size(); ++i) {
+		this->embedding_matrix[i].resize(this->embedding_size);
+
+		for (size_t j = 0; j < this->embedding_size; ++j) {
+			this->embedding_matrix[i][j] = get_random_uniform();
+		}
+	}
+
+}
+
 void	Word2vec::one_hot_encoder() {
-	
+
 }
